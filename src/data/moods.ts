@@ -1,6 +1,6 @@
-import { TMoods } from '../types'
+import { TMood } from '../types'
 
-export const MOODS: TMoods[] = [
+export const MOODS: TMood[] = [
   { emoji: '🧑‍💻', description: 'studious' },
   { emoji: '🤔', description: 'pensive' },
   { emoji: '😊', description: 'happy' },

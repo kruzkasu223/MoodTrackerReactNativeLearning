@@ -1,6 +1,6 @@
 export const theme = {
   colour: {
-    purple: '#454C73',
+    kruzpink: '#DE3163',
     white: '#FFFFFF',
   },
 }
