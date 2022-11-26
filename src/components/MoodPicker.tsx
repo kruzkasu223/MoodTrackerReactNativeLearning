@@ -1,15 +1,23 @@
 import { useCallback } from 'react'
 import { useState } from 'react'
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import { MOODS } from '../data'
 import { useMoodHistory } from '../atoms'
 import { theme } from '../theme'
 import { TMood } from '../types'
+import Reanimated, {
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated'
+
+const butterFliesImage = require('../../assets/images/butterflies.png')
+const ReanimatedPressable = Reanimated.createAnimatedComponent(Pressable)
 
 export const MoodPicker = () => {
   const { setMoodHistory } = useMoodHistory()
 
   const [selectedMood, setSelectedMood] = useState<TMood>()
+  const [hasSelected, setHasSelected] = useState(false)
 
   const handleSelect = useCallback((selectedMood?: TMood) => {
     if (!selectedMood) {
@@ -18,7 +26,29 @@ export const MoodPicker = () => {
     }
     setMoodHistory(selectedMood)
     setSelectedMood(undefined)
+    setHasSelected(true)
   }, [])
+
+  const buttonStyle = useAnimatedStyle(
+    () => ({
+      opacity: withTiming(selectedMood ? 1 : 0.7),
+      transform: [{ scale: withTiming(selectedMood ? 1 : 0.9) }],
+    }),
+    [selectedMood],
+  )
+
+  if (hasSelected) {
+    return (
+      <View style={styles.container}>
+        <Image source={butterFliesImage} style={styles.image} />
+        <Pressable
+          style={styles.selectBtn}
+          onPress={() => setHasSelected(false)}>
+          <Text style={styles.selectBtnTxt}>Choose Another</Text>
+        </Pressable>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -49,11 +79,11 @@ export const MoodPicker = () => {
         ))}
       </View>
       <View style={styles.btnContainer}>
-        <Pressable
+        <ReanimatedPressable
           onPress={() => handleSelect(selectedMood)}
-          style={styles.selectBtn}>
+          style={[styles.selectBtn, buttonStyle]}>
           <Text style={styles.selectBtnTxt}>Choose</Text>
-        </Pressable>
+        </ReanimatedPressable>
       </View>
     </View>
   )
@@ -65,13 +95,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 20,
     borderRadius: 12,
+    height: 240,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'space-between',
   },
   title: {
+    fontFamily: theme.fonts.bold,
     textAlign: 'center',
     fontSize: 22,
     color: theme.colour.kruzpink,
-    fontWeight: 'bold',
-    marginBottom: 24,
+  },
+  image: {
+    alignSelf: 'center',
   },
   emojiContainer: {
     flexDirection: 'row',
@@ -96,8 +131,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colour.white,
   },
   emojiText: {
+    fontFamily: theme.fonts.bold,
     color: theme.colour.kruzpink,
-    fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 10,
     textTransform: 'uppercase',
@@ -110,7 +145,6 @@ const styles = StyleSheet.create({
   btnContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 24,
   },
   selectBtn: {
     backgroundColor: theme.colour.kruzpink,
@@ -119,10 +153,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   selectBtnTxt: {
+    fontFamily: theme.fonts.bold,
     color: theme.colour.white,
     textAlign: 'center',
     textTransform: 'uppercase',
-    fontWeight: 'bold',
     fontSize: 16,
   },
 })
